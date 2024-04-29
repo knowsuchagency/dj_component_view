@@ -47,6 +47,15 @@ You can set the method class variable in your ComponentView subclass to specify 
 - If `method` is set to `"GET"`, only GET requests will be allowed.
 - If `method` is set to `"POST"`, only POST requests will be allowed.
 
+```python
+class CustomView(ComponentView):
+    component = "CustomComponent"
+    method = "get"
+
+    ...
+
+```
+
 If the incoming request's method does not match the specified method, a 405 Method Not Allowed response will be returned.
 
 ### Overriding the get and post Methods

@@ -7,7 +7,7 @@ from django.views import View
 
 class ComponentView(View):
     component = None
-    method = None
+    method = "POST"
 
     def get_catalog(self):
         for template_engine in settings.TEMPLATES:
@@ -26,21 +26,17 @@ class ComponentView(View):
         return HttpResponse(str(catalog.render(self.component, **context)))
 
     def dispatch(self, request, *args, **kwargs):
-        if self.method is not None and request.method.lower() != self.method.lower():
+        if request.method.lower() != self.method.lower():
             return HttpResponseNotAllowed([self.method])
         return super().dispatch(request, *args, **kwargs)
 
     def get(self, request, *args, **kwargs):
-        if self.method is None or self.method.lower() == "get":
-            context = self.context(request)
-            return self.render_to_response(context)
-        return HttpResponseNotAllowed(["GET"])
+        context = self.context(request)
+        return self.render_to_response(context)
 
     def post(self, request, *args, **kwargs):
-        if self.method is None or self.method.lower() == "post":
-            context = self.context(request)
-            return self.render_to_response(context)
-        return HttpResponseNotAllowed(["POST"])
+        context = self.context(request)
+        return self.render_to_response(context)
 
     def context(self, request):
         return {}

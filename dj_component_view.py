@@ -1,12 +1,13 @@
 from importlib import import_module
 
-from django.http import HttpResponse
-from django.views import View
 from django.conf import settings
+from django.http import HttpResponse, HttpResponseNotAllowed
+from django.views import View
 
 
 class ComponentView(View):
     component = None
+    method = None
 
     def get_catalog(self):
         for template_engine in settings.TEMPLATES:
@@ -24,13 +25,22 @@ class ComponentView(View):
             raise ValueError("ComponentView subclasses must define a component.")
         return HttpResponse(str(catalog.render(self.component, **context)))
 
+    def dispatch(self, request, *args, **kwargs):
+        if self.method is not None and request.method.lower() != self.method.lower():
+            return HttpResponseNotAllowed([self.method])
+        return super().dispatch(request, *args, **kwargs)
+
     def get(self, request, *args, **kwargs):
-        context = self.context(request)
-        return self.render_to_response(context)
+        if self.method is None or self.method.lower() == "get":
+            context = self.context(request)
+            return self.render_to_response(context)
+        return HttpResponseNotAllowed(["GET"])
 
     def post(self, request, *args, **kwargs):
-        context = self.context(request)
-        return self.render_to_response(context)
+        if self.method is None or self.method.lower() == "post":
+            context = self.context(request)
+            return self.render_to_response(context)
+        return HttpResponseNotAllowed(["POST"])
 
     def context(self, request):
         return {}

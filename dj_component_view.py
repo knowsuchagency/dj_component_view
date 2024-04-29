@@ -28,5 +28,9 @@ class ComponentView(View):
         context = self.context(request)
         return self.render_to_response(context)
 
+    def post(self, request, *args, **kwargs):
+        context = self.context(request)
+        return self.render_to_response(context)
+
     def context(self, request):
         return {}

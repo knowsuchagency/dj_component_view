@@ -22,7 +22,6 @@ class ComponentView(View):
 
     def render_to_response(self, context):
         catalog = self.get_catalog()
-        catalog.jinja_env.globals.update(context)
         if not self.component:
             raise ValueError("ComponentView subclasses must define a component.")
         return HttpResponse(str(catalog.render(self.component, **context)))

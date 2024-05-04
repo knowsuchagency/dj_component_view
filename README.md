@@ -4,7 +4,7 @@ This project lets you create reusable Django views from [jinjax](https://jinjax.
 
 ## Usage
 
-### templates/components/Greeting.jinja
+### Greeting.jinja
 
 ```jinja
 <h1>hello, {{ name }}</h1>
@@ -18,22 +18,17 @@ from djecorator import Route
 
 route = Route()
 
-@route("/")
-class IndexView(ComponentView):
-    template = "components/Index.jinja"
-
-
 @route("/greet", name="greet")
 class GreetView(ComponentView):
-    template = "components/Greeting.jinja"
+    component = "Greeting"
 
-    def context(self, request):
+    def render(self, request):
         return {
             "name": request.GET.get("name", "World"),
         }
 ```
 
-### templates/components/Index.jinja with [htmx](https://htmx.org)
+### index.html with [htmx](https://htmx.org)
 
 ```html
 <form hx-get="{{ url('greet') }}" hx-trigger="submit">

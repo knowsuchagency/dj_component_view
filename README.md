@@ -1,5 +1,7 @@
 # dj_component_view
 
+# TODO: update the readme
+
 This project lets you create reusable Django views from [jinjax](https://jinjax.scaletti.dev/) templates.
 
 ## Usage

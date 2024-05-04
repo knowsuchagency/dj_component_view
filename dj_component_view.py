@@ -1,4 +1,5 @@
 from importlib import import_module
+from typing import Union
 
 from django.conf import settings
 from django.http import HttpResponse, HttpResponseNotAllowed
@@ -32,9 +33,16 @@ class ComponentView(View):
         return super().dispatch(request, *args, **kwargs)
     
     def _base_get_post(self, request, *args, **kwargs):
-        context = self.context(request)
-        context.setdefault("request", request)
-        return self.render_to_response(context)
+        rendered = self.render(request)
+
+        if isinstance(rendered, HttpResponse):
+            return rendered
+        elif rendered is None:
+            rendered = {}
+
+        rendered.setdefault("request", request)
+
+        return self.render_to_response(rendered)
 
     def get(self, request, *args, **kwargs):
         return self._base_get_post(request, *args, **kwargs)
@@ -42,5 +50,5 @@ class ComponentView(View):
     def post(self, request, *args, **kwargs):
         return self._base_get_post(request, *args, **kwargs)
 
-    def context(self, request):
+    def render(self, request) -> Union[dict, HttpResponse, None]:
         return {}

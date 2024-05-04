@@ -1,12 +1,10 @@
 # dj_component_view
 
-# TODO: update the readme
-
 This project lets you create reusable Django views from [jinjax](https://jinjax.scaletti.dev/) templates.
 
 ## Usage
 
-### Greeting.jinja
+### templates/components/Greeting.jinja
 
 ```jinja
 <h1>hello, {{ name }}</h1>
@@ -20,9 +18,14 @@ from djecorator import Route
 
 route = Route()
 
-@route("/greet")
+@route("/")
+class IndexView(ComponentView):
+    template = "components/Index.jinja"
+
+
+@route("/greet", name="greet")
 class GreetView(ComponentView):
-    component = "Greeting"
+    template = "components/Greeting.jinja"
 
     def context(self, request):
         return {
@@ -30,10 +33,10 @@ class GreetView(ComponentView):
         }
 ```
 
-### index.html with [htmx](https://htmx.org)
+### templates/components/Index.jinja with [htmx](https://htmx.org)
 
 ```html
-<form hx-get="/greet" hx-trigger="submit">
+<form hx-get="{{ url('greet') }}" hx-trigger="submit">
   <input type="text" name="name" placeholder="Enter your name" />
   <button type="submit">Greet</button>
 </form>
@@ -50,7 +53,7 @@ You can set the `methods` class variable in your ComponentView subclass to speci
 ```python
 class CustomView(ComponentView):
     component = "CustomComponent"
-    methods = ["get"]
+    methods = ["post"]
 
     ...
 

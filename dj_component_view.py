@@ -7,7 +7,7 @@ from django.views import View
 
 class ComponentView(View):
     component = None
-    method = "POST"
+    methods = ["GET"]
 
     def get_catalog(self):
         for template_engine in settings.TEMPLATES:
@@ -21,22 +21,26 @@ class ComponentView(View):
 
     def render_to_response(self, context):
         catalog = self.get_catalog()
+        catalog.jinja_env.globals.update(context)
         if not self.component:
             raise ValueError("ComponentView subclasses must define a component.")
         return HttpResponse(str(catalog.render(self.component, **context)))
 
     def dispatch(self, request, *args, **kwargs):
-        if request.method.lower() != self.method.lower():
-            return HttpResponseNotAllowed([self.method])
+        if request.method.lower() not in (method.lower() for method in self.methods):
+            return HttpResponseNotAllowed(self.methods)
         return super().dispatch(request, *args, **kwargs)
+    
+    def _base_get_post(self, request, *args, **kwargs):
+        context = self.context(request)
+        context.setdefault("request", request)
+        return self.render_to_response(context)
 
     def get(self, request, *args, **kwargs):
-        context = self.context(request)
-        return self.render_to_response(context)
+        return self._base_get_post(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
-        context = self.context(request)
-        return self.render_to_response(context)
+        return self._base_get_post(request, *args, **kwargs)
 
     def context(self, request):
         return {}

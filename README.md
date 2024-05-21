@@ -22,7 +22,7 @@ route = Route()
 @component("Greeting")
 def greet(request):
     return {
-        "name": request.GET.get("name", "World"),
+        "name": "World"
     }
 ```
 

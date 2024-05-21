@@ -5,7 +5,7 @@ build-backend = "flit_core.buildapi"
 [project]
 name = "dj_component_view"
 description = "Django component view for jinjax"
-version = "8.0"
+version = "9.0"
 readme = "README.md"
 authors = [{name = "Stephan Fitzpatrick", email = "knowsuchagency@gmail.com"}]
 license = {file = "LICENSE"}

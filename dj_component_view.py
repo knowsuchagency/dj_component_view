@@ -1,5 +1,6 @@
 from importlib import import_module
 from typing import Union
+from functools import wraps
 
 from django.conf import settings
 from django.http import HttpResponse, HttpResponseNotAllowed
@@ -30,7 +31,7 @@ class ComponentView(View):
         if request.method.lower() not in (method.lower() for method in self.methods):
             return HttpResponseNotAllowed(self.methods)
         return super().dispatch(request, *args, **kwargs)
-    
+
     def _base_get_post(self, request, *args, **kwargs):
         rendered = self.render(request)
 
@@ -51,3 +52,23 @@ class ComponentView(View):
 
     def render(self, request) -> Union[dict, HttpResponse, None]:
         return {}
+
+
+def component(component_name, methods=["GET"]):
+    def decorator(func):
+        @wraps(func)
+        def wrapper(request, *args, **kwargs):
+            _methods = methods
+            class WrappedComponentView(ComponentView):
+                component = component_name
+                methods = _methods
+
+                def render(self, request):
+                    return func(request, *args, **kwargs)
+
+            view = WrappedComponentView.as_view()
+            return view(request, *args, **kwargs)
+
+        return wrapper
+
+    return decorator
